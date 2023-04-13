@@ -103,6 +103,21 @@ router.route('/api')
     })
 
 
+    router.route('/demo').get(async(req,res)=>{
+
+      const id='abcde1';
+    
+      Md_model.findOne({uid:id}).then((data)=>{
+        console.log(data);
+        res.status(200).send(data);
+      }).catch((error)=>{
+        console.log(error);
+        res.send(error);
+      })
+    
+    })
+
+
 
 
 module.exports=router;

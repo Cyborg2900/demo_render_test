@@ -50,7 +50,7 @@ app.get('/testing',(req,res)=>{
     console.log(req.body);
     console.log(req.params);
     console.log(req.query);
-    res.status(200).send();
+    res.status(200).send('hello world ');
 })
 
 
