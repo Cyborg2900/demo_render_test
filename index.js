@@ -7,7 +7,7 @@ const path=require('path');
 
 const app=express();
 
-const PORT=process.env.PORT || 5005;
+const PORT=process.env.PORT || 6005;
 
 app.use(bodyParser.json());
 app.use(express.static('./front_end'));
@@ -27,7 +27,7 @@ app.get('/',(req,res)=>{
     res.sendFile(path.resolve(__dirname,'./front_end/index.html'));
 })
 app.get('/second',(req,res)=>{
-  res.sendFile(path.resolve(__dirname,'./front_end/index.html'));
+  res.sendFile(path.resolve(__dirname,'./front_end/second.html'));
 })
 
 
