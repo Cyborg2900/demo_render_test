@@ -4,65 +4,6 @@ const router=express.Router();
 const {User_model,Sd_model,Md_model}=require('../db/schema_db');
 
 router.route('/api')
-    .get(async(req,res)=>{
-        const {id,dd1,dd2,dd3,dd4,ad1}=req.body;
-
-        //finding the device field from db
-        Md_model.find({uid:id}).then((data1)=>{
-          return  Sd_model.find({uid:id}).then((data)=>{ return [data,data1] });
-        }).then((data)=>{
-
-          const [[S_data],[M_data]]=data;
-
-          // checking whether the db and device are synced or not 
-          if(dd1== M_data.status_1 && dd2==M_data.status_2 && dd3==M_data.status_3 && dd4==M_data.status_4 ){
-              M_data.sync=true;
-
-              S_data.status=ad1;
-              // saving the current state of devices to db
-              S_data.save().then(()=>{
-                M_data.save()
-
-              }).then(()=>{
-                res.send('synced'); // once state is updated in db then sending a response 
-
-              }).catch((error)=>{
-                console.log(error);
-                res.send(error);
-              })
-
-
-          }else{  // if not synced then changing flag to false and sending the changes to device 
-              S_data.status=ad1;
-              M_data.sync=false;
-
-
-              S_data.save().then(()=>{  // updating the temp and sync flag
-                M_data.save()
-
-              }).then(()=>{
-                res.json({ // sending the updates to the device 
-                  "dd1":M_data.status_1,
-                  "dd2":M_data.status_2,
-                  "dd3":M_data.status_3,
-                  "dd4":M_data.status_4
-                }); 
-
-              }).catch((error)=>{
-                console.log(error);
-                res.send(error);
-              })
-            }
-
-          }
-          
-        ).catch((error)=>{
-            console.log(error);
-            res.send(error);
-        })
-        
-
-    })
     .post(async(req,res)=>{
         const{email,id}=req.body;
         console.log(email,id," hello world hello ");
@@ -162,7 +103,7 @@ router.route('/api')
     })
 
 
-router.route('/demo')
+router.route('/get')
     .get(async(req,res)=>{
 
       const id='abcde1';
@@ -176,6 +117,65 @@ router.route('/demo')
       })
     
     })
+    .put(async(req,res)=>{
+      const {id,dd1,dd2,dd3,dd4,ad1}=req.body;
+
+      //finding the device field from db
+      Md_model.find({uid:id}).then((data1)=>{
+        return  Sd_model.find({uid:id}).then((data)=>{ return [data,data1] });
+      }).then((data)=>{
+
+        const [[S_data],[M_data]]=data;
+
+        // checking whether the db and device are synced or not 
+        if(dd1== M_data.status_1 && dd2==M_data.status_2 && dd3==M_data.status_3 && dd4==M_data.status_4 ){
+            M_data.sync=true;
+
+            S_data.status=ad1;
+            // saving the current state of devices to db
+            S_data.save().then(()=>{
+              M_data.save()
+
+            }).then(()=>{
+              res.send('synced'); // once state is updated in db then sending a response 
+
+            }).catch((error)=>{
+              console.log(error);
+              res.send(error);
+            })
+
+
+        }else{  // if not synced then changing flag to false and sending the changes to device 
+            S_data.status=ad1;
+            M_data.sync=false;
+
+
+            S_data.save().then(()=>{  // updating the temp and sync flag
+              M_data.save()
+
+            }).then(()=>{
+              res.json({ // sending the updates to the device 
+                "dd1":M_data.status_1,
+                "dd2":M_data.status_2,
+                "dd3":M_data.status_3,
+                "dd4":M_data.status_4
+              }); 
+
+            }).catch((error)=>{
+              console.log(error);
+              res.send(error);
+            })
+          }
+
+        }
+        
+      ).catch((error)=>{
+          console.log(error);
+          res.send(error);
+      })
+      
+
+  })
 
 
 
