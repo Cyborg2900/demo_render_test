@@ -36,7 +36,7 @@ app.use('/user',users);
 app.use('/device',devices);
 app.use(express.static('./front_end'));
 
-//creating a function to connect to mongodb for cyclic
+//creating a function to connect to mongodb for render
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
@@ -83,21 +83,8 @@ app.get('/second',(req,res)=>{
 
 
 
-
-//Connect to the database before listening
 connectDB().then(() => {
   app.listen(PORT, () => {
       console.log("listening for requests");
   })
 })
-
-
-
-// mongoose.connect(url).then(() => {
-
-//     app.listen(PORT, ()=>{
-//         console.log('listening to port');
-//     })
-//   }).catch(error => {
-//     console.error(error);
-//   });
