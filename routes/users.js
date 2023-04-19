@@ -93,6 +93,7 @@ router.route('/device_status')
         }
 
         try {
+            console.log(req.body.token);
             const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
             
             User_model.findOne({email:decode.email}).then((user_data)=>{
