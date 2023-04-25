@@ -6,7 +6,9 @@ const jwt= require('jsonwebtoken');
 
 const bcrypt=require('bcrypt');
 
-const {User_model,Sd_model,Md_model}=require('../db/schema_db');
+const jwt_auth=require('../authentication/token_auth');
+
+const {User_model,D_model,D_username}=require('../db/schema_db');
 
 
 
@@ -25,11 +27,12 @@ router.route('/register')  // register the user
             bcrypt.hash(req.body.password,10).then((hash)=>{
                 console.log(hash);
                 const U_data=new User_model({email:req.body.email, name : req.body.name ,password:hash, s_device:[] , m_device:[]});
-
+                const token = jwt.sign({email}, process.env.JWT_SECRET ,{expiresIn:"30m"});
                 U_data.save().then(()=>{
                     console.log("user added to db");
                     res.send({
-                        "output":'user added to db'
+                        "output":'user added to db',
+                        token:token,
                     });
                 }).catch((error)=>{
                     console.log(error)
@@ -56,12 +59,11 @@ router.route('/login')
         User_model.findOne({email:email}).then((data)=>{    // extracting the info of user from db
             bcrypt.compare(password,data.password).then((response)=>{
                 if(response){
-                        const {s_device,m_device}=data;
+                        const{devices}=data;
                         const token = jwt.sign({email}, process.env.JWT_SECRET ,{expiresIn:"30m"});
                         const demo={
                             "name":data.name,
-                            "single_device":s_device,
-                            "multi_device":m_device,
+                            "device_status":devices,
                             "token":token
                         }
                         res.json(demo);
@@ -83,60 +85,120 @@ router.route('/login')
 
 
 
+router.use('/device',jwt_auth);
 
 
+router.route('/device/get')
+    .post(async(req,res)=>{  // when user ask for the status of specific decive
+        console.log("\n\n\n",req.body.email);
 
-router.route('/device_status')
-    .get(async(req,res)=>{
-        if(!req.body.token){
-            res.status(401).send({"output":"Unauthorized request no token provided"});
-        }
-
-        try {
-            console.log(req.body.token);
-            const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
-            
-            User_model.findOne({email:decode.email}).then((user_data)=>{
-                const s_device=user_data.s_device;
-
-                const device_data={};
-
-                const read_db=function(id){ // creating a promise funtion to read the status of all the devices of the user
-                    return new Promise((rej, res)=>{
-                        Sd_model.findOne({uid:id}).then((s_data)=>{
-                            device_data.id.single=s_data.status;
-                        }).then(()=>{
-                            Md_model.findOne({uid:id}).then((m_data)=>{
-                                device_data.id.multi={
-                                    status_1:m_data.status_1,
-                                    status_1:m_data.status_2,
-                                    status_1:m_data.status_3,
-                                    status_1:m_data.status_4,
-                                };
-                            })
-                        })
+        D_username.findOne({d_name:req.body.device_name}).then((data)=>{
+            D_model.findOne({uid:data.id}).then((device)=>{
+                
+                if(Date.now()-device.last_time>5000){ // to check weather device is ofline or not 
+                    res.send({
+                        'output':'device is ofline',
+                        status_1:device.status_1,
+                        status_2:device.status_2,
+                        status_3:device.status_3,
+                        status_4:device.status_4,
+                        status_temp:device.status_temp
+                    })
+                }else{
+                    res.send({
+                        status_1:device.status_1,
+                        status_2:device.status_2,
+                        status_3:device.status_3,
+                        status_4:device.status_4,
+                        status_temp:device.status_temp,
                     })
                 }
-                let promises =[] // creating an array to store all promises for the for loop
-                s_device.forEach((id)=>{  // reading data of each id that is assign to that email and creating its promise
-                    read_db(id);
-                })
-
-                // resolving all promises before sending the response to user
-                Promise.all(promises).then(()=> res.send(device_data)).catch((error)=>{
-                    console.log(error);
-                    res.status(400).send({"output":"error occured while reading the status of devices"});
-                })
-
             })
-          } catch (err) {
-            res.status(400).send({"output":"Invalid token."});
-          }
-
+        }).catch((err)=>{
+            console.log(err)
+            res.json({'output':"error occured"});
+        })
         
     })
     .put(async(req,res)=>{
+        // changes made to any particular device 
+        D_username.findOne(({d_name:req.body.device_name})).then((data)=>{
+            Md_model.findOne({uid:data.id}).then((device)=>{
+                const user_device=req.body;
+                if(user_device.status_1==device.status_1 && user_device.status_2==device.status_2 && user_device.status_3==device.status_3 && user_device.status_4==device.status_4){
+                    Md_model.updateOne({uid:id},{$set : {sync:true}}).then(()=>{
+                        res.send({
+                            'output':'device is in sync'
+                        })
+                    }).catch((err)=>{
+                        console.log(err)
+                        res.json({'output':"error occured"});
+                    })
+                    
+                }else{
+                    Md_model.updateOne({uid:id} ,{ $set: {status_1:user_device.status_1,status_2:user_device.status_2,status_3:user_device.status_3,status_4:user_device.status_4 , sync:false }}).then(()=>{
+                        setTimeout(()=>{
+                            Md_model.findOne({uid:id}).then((data)=>{
+                                if(data.sync){
+                                    res.send({
+                                        'output':'device is in sync'
+                                    })
+                                }else{
+                                    console.log('not in sync')
+                                    res.json({'output':"error occured check after sometime"});
+                                }
+                            })
+                        },3000);
+                    }).catch((err)=>{
+                        console.log(err)
+                        res.json({'output':"error occured"});
+                    })
+                }
+            }).catch((err)=>{
+                console.log(err)
+                res.json({'output':"error occured"});
+            })
+        }).catch((err)=>{
+            console.log(err)
+            res.json({'output':"error occured"});
+        })
+    })
 
+router.route('device/add')
+    .post(async(req,res)=>{
+        const email=req.body.email;
+        D_username.findOne({d_name:req.body.username}).then((data)=>{
+            if(data==null){
+                res.send({
+                    'output':'no device with this username exits '
+                })
+                return ;
+            }
+            if(data.otp==req.body.otp){
+                User_model.updateOne({email:email},{ $push: { s_device: req.body.username ,m_device:req.body.username }}).then(()=>{
+                    data.email=email;
+                    data.save().then(()=>{
+                        res.send({
+                            'output':'device added to db'
+                        })
+                    }).catch((err)=>{
+                        console.log(err)
+                        res.json({'output':"error occured"});
+                    })
+                }).catch((err)=>{
+                    console.log(err)
+                    res.json({'output':"error occured"});
+                })
+            }else{
+                res.send({
+                    'output':'wrong otp'
+                });
+            }
+
+        }).catch((err)=>{
+            console.log(err)
+            res.json({'output':"error occured"});
+        })
     })
 
 

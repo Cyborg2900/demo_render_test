@@ -84,7 +84,7 @@ app.get('/second',(req,res)=>{
 
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(5005, () => {
       console.log("listening for requests");
   })
 })
