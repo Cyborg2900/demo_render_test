@@ -9,6 +9,7 @@ const bcrypt=require('bcrypt');
 const jwt_auth=require('../authentication/token_auth');
 
 const {User_model,D_model,D_username}=require('../db/schema_db');
+const authenticateToken = require('../authentication/token_auth');
 
 
 
@@ -17,7 +18,7 @@ router.route('/register')  // register the user
         ///registration of user
         console.log("\n\n\n",req.body);
         // const {email,password}=req.body;
-
+        const email=req.body.email;
 
         User_model.findOne({email:req.body.email}).then((data)=>{
             if(data !==null){       // checking whether a email already exits or not 
@@ -26,7 +27,7 @@ router.route('/register')  // register the user
             }
             bcrypt.hash(req.body.password,10).then((hash)=>{
                 console.log(hash);
-                const U_data=new User_model({email:req.body.email, name : req.body.name ,password:hash, s_device:[] , m_device:[]});
+                const U_data=new User_model({email:req.body.email, name : req.body.name ,password:hash,device:[]});
                 const token = jwt.sign({email}, process.env.JWT_SECRET ,{expiresIn:"30m"});
                 U_data.save().then(()=>{
                     console.log("user added to db");
@@ -85,35 +86,42 @@ router.route('/login')
 
 
 
-router.use('/device',jwt_auth);
+router.use('/device', authenticateToken);
 
 
-router.route('/device/get')
+router.route('/device')
     .post(async(req,res)=>{  // when user ask for the status of specific decive
         console.log("\n\n\n",req.body.email);
 
-        D_username.findOne({d_name:req.body.device_name}).then((data)=>{
-            D_model.findOne({uid:data.id}).then((device)=>{
-                
-                if(Date.now()-device.last_time>5000){ // to check weather device is ofline or not 
-                    res.send({
-                        'output':'device is ofline',
-                        status_1:device.status_1,
-                        status_2:device.status_2,
-                        status_3:device.status_3,
-                        status_4:device.status_4,
-                        status_temp:device.status_temp
-                    })
-                }else{
-                    res.send({
-                        status_1:device.status_1,
-                        status_2:device.status_2,
-                        status_3:device.status_3,
-                        status_4:device.status_4,
-                        status_temp:device.status_temp,
-                    })
-                }
-            })
+        D_username.findOne({d_name:req.body.username}).then((data)=>{
+            if(data.email==req.body.email){  // to check if the request made  is by a genuine owner
+                D_model.findOne({uid:data.uid}).then((device)=>{
+                    //console.log(device);///////////
+                    if(Date.now()-device.last_time>5000){ // to check weather device is ofline or not 
+                        res.send({
+                            'output':'device is ofline',
+                            status_1:device.status_1,
+                            status_2:device.status_2,
+                            status_3:device.status_3,
+                            status_4:device.status_4,
+                            status_temp:device.status_temp
+                        })
+                    }else{
+                        res.send({
+                            status_1:device.status_1,
+                            status_2:device.status_2,
+                            status_3:device.status_3,
+                            status_4:device.status_4,
+                            status_temp:device.status_temp,
+                        })
+                    }
+                })
+            }else{
+                res.send({
+                    'output':'device does not belong to you'
+                })
+                return ;
+            }
         }).catch((err)=>{
             console.log(err)
             res.json({'output':"error occured"});
@@ -122,51 +130,59 @@ router.route('/device/get')
     })
     .put(async(req,res)=>{
         // changes made to any particular device 
-        D_username.findOne(({d_name:req.body.device_name})).then((data)=>{
-            Md_model.findOne({uid:data.id}).then((device)=>{
-                const user_device=req.body;
-                if(user_device.status_1==device.status_1 && user_device.status_2==device.status_2 && user_device.status_3==device.status_3 && user_device.status_4==device.status_4){
-                    Md_model.updateOne({uid:id},{$set : {sync:true}}).then(()=>{
-                        res.send({
-                            'output':'device is in sync'
-                        })
-                    }).catch((err)=>{
-                        console.log(err)
-                        res.json({'output':"error occured"});
-                    })
-                    
-                }else{
-                    Md_model.updateOne({uid:id} ,{ $set: {status_1:user_device.status_1,status_2:user_device.status_2,status_3:user_device.status_3,status_4:user_device.status_4 , sync:false }}).then(()=>{
-                        setTimeout(()=>{
-                            Md_model.findOne({uid:id}).then((data)=>{
-                                if(data.sync){
-                                    res.send({
-                                        'output':'device is in sync'
-                                    })
-                                }else{
-                                    console.log('not in sync')
-                                    res.json({'output':"error occured check after sometime"});
-                                }
+        D_username.findOne(({d_name:req.body.username})).then((data)=>{
+            if(data.email==req.body.email){
+                D_model.findOne({uid:data.uid}).then((device)=>{
+                    const user_device=req.body;
+                    if(user_device.status_1==device.status_1 && user_device.status_2==device.status_2 && user_device.status_3==device.status_3 && user_device.status_4==device.status_4){
+                        D_model.updateOne({uid:data.uid},{$set : {sync:true}}).then(()=>{
+                            res.send({
+                                'output':'device is in sync'
                             })
-                        },3000);
-                    }).catch((err)=>{
-                        console.log(err)
-                        res.json({'output':"error occured"});
-                    })
-                }
-            }).catch((err)=>{
-                console.log(err)
-                res.json({'output':"error occured"});
-            })
+                        }).catch((err)=>{
+                            console.log(err)
+                            res.json({'output':"error occured"});
+                        })
+                        
+                    }else{
+                        D_model.updateOne({uid:data.uid} ,{ $set: {status_1:user_device.status_1,status_2:user_device.status_2,status_3:user_device.status_3,status_4:user_device.status_4 , sync:false }}).then(()=>{
+                            setTimeout(()=>{
+                                D_model.findOne({uid:id}).then((data1)=>{
+                                    if(data1.sync){
+                                        res.send({
+                                            'output':'device is in sync'
+                                        })
+                                    }else{
+                                        console.log('not in sync')
+                                        res.json({'output':"error occured check after sometime"});
+                                    }
+                                })
+                            },3000);
+                        }).catch((err)=>{
+                            console.log(err)
+                            res.json({'output':"error occured"});
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                    res.json({'output':"error occured"});
+                })
+            }else{
+                res.send({
+                    'output':'device does not belong to you'
+                })
+                return ;
+            }
         }).catch((err)=>{
             console.log(err)
             res.json({'output':"error occured"});
         })
     })
 
-router.route('device/add')
+router.route('/device/add')
     .post(async(req,res)=>{
         const email=req.body.email;
+        console.log(req.body.username,email)
         D_username.findOne({d_name:req.body.username}).then((data)=>{
             if(data==null){
                 res.send({
@@ -175,7 +191,7 @@ router.route('device/add')
                 return ;
             }
             if(data.otp==req.body.otp){
-                User_model.updateOne({email:email},{ $push: { s_device: req.body.username ,m_device:req.body.username }}).then(()=>{
+                User_model.updateOne({email:email},{ $push: { devices: req.body.username }}).then(()=>{
                     data.email=email;
                     data.save().then(()=>{
                         res.send({

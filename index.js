@@ -20,6 +20,7 @@ const corsOptions ={
 //routes
 const users= require('./routes/users');
 const devices=require('./routes/devices');
+const admin=require('./routes/device_add');
 
 const app=express();
 
@@ -34,6 +35,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/user',users);
 app.use('/device',devices);
+app.use('/admin',admin);
 app.use(express.static('./front_end'));
 
 //creating a function to connect to mongodb for render
@@ -84,7 +86,7 @@ app.get('/second',(req,res)=>{
 
 
 connectDB().then(() => {
-  app.listen(5005, () => {
+  app.listen(PORT, () => {
       console.log("listening for requests");
   })
 })

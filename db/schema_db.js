@@ -32,7 +32,8 @@ const device_schema= new mongoose.Schema({
 
   last_time:{
     type:Number,
-    require:true
+    require:true,
+    default:0
   },
   sync:{
     type: Boolean,
@@ -72,7 +73,7 @@ const user_schema=new mongoose.Schema({
 
 const User_model=mongoose.model('Users',user_schema);
 // const Sd_model= mongoose.model('S_Device',single_device_schema);
-const D_model=mongoose.model('M_Device',device_schema);
+const D_model=mongoose.model('Device',device_schema);
 const D_username=mongoose.model('D_username',device_username);
 
 

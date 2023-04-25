@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-
 function authenticateToken(req, res, next) {
   const token=req.body.token;
 
@@ -12,7 +11,7 @@ function authenticateToken(req, res, next) {
       return res.status(403).json({ error: 'Invalid token' });
     }
 
-    req.body.email = user;
+    req.body.email = user.email;
     next();
   });
 }
