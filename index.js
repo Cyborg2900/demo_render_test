@@ -34,7 +34,7 @@ const client = new MongoClient(url);
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/user',users);
-app.use('/device',devices);
+app.use('/devices',devices);
 app.use('/admin',admin);
 app.use(express.static('./front_end'));
 
