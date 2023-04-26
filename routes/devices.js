@@ -9,6 +9,7 @@ router.route('/get')
 
       const id=req.body.id;
       const device=req.body;
+      console.log(device);
       D_model.findOne({uid:id}).then((data)=>{
         D_model.updateOne({uid:id},{$set: {last_time:Date.now()}}).then(()=>{
           if(data.status_1==device.status_1 && data.status_2==device.status_2 && data.status_3==device.status_3 && data.status_4==device.status_4){
