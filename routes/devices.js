@@ -80,14 +80,14 @@ router.route('/get')
           return;
         }
         if(device.type==1){
-          D_model.updateOne({uid:id},{$set:{status_1:status_1,status_2:status_2,status_3:status_3,status_4:status_4,last_time:Date.now() , status_temp:req.body.temp , status_hum:req.body.hum}}).then(()=>{
+          D_model.updateOne({uid:id},{$set:{status_1:status_1,status_2:status_2,status_3:status_3,status_4:status_4, status_temp:req.body.temp , status_hum:req.body.hum ,last_time:Date.now() }}).then(()=>{
             res.send('changes made to db');
           }).catch((err)=>{
             console.log(err); 
             res.send("error occured");
           })
         }else {
-          D_model.updateOne({uid:id},{$set:{status_1:status_1,status_2:status_2,status_3:status_3,status_4:status_4,last_time:Date.now() , status_motion:req.body.motion}}).then(()=>{
+          D_model.updateOne({uid:id},{$set:{status_1:status_1,status_2:status_2,status_3:status_3,status_4:status_4, status_motion:req.body.motion ,last_time:Date.now() }}).then(()=>{
             res.send('changes made to db');
           }).catch((err)=>{
             console.log(err); 

@@ -252,6 +252,48 @@ router.route('/device/add')
         })
     })
 
+    router.route('/device/delete')
+        .post(async(req,res)=>{
+            console.log(req.body,'delete device from user id');
+            D_username.findOne({d_name:req.body.username}).then((data)=>{
+                if(data==null){
+                    res.send({
+                        'output':'no device with this username exits '
+                    })
+                    return ;
+                }
+                if(data.email==req.body.email){
+                    User_model.updateOne({email:email},{ $pull: { devices: req.body.username }}).then(()=>{
+                        data.email=null;
+                        data.save().then(()=>{
+                            res.send({
+                                'output':'device added to db'
+                            })
+                        }).catch((err)=>{
+                            console.log(err)
+                            res.json({'output':"error occured"});
+                        })
+                    }).catch((err)=>{
+                        console.log(err)
+                        res.json({'output':"error occured"});
+                    })
+                }else if(data.email!=req.body.email){
+                    res.send({
+                        'output':'device does not belong to you'
+                    })
+                }else if(data.email==null) {
+                    res.send({
+                        'output':'device already deleted from your id '
+                    })
+                }
+    
+            }).catch((err)=>{
+                console.log(err)
+                res.json({'output':"error occured"});
+            })
+
+        })
+
 
 
 
