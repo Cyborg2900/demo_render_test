@@ -72,6 +72,7 @@ router.route('/get')
     
     })
     .put(async(req,res)=>{
+      console.log(req.body,'\n\n');
       const {id,status_1,status_2,status_3,status_4}=req.body;
       D_model.findOne({uid:id}).then((device)=>{
         if(device==null){
