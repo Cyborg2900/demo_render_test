@@ -18,7 +18,8 @@ router.route('/adding-device')
         })
 
         const d_device=new D_model({
-            uid:req.body.id
+            uid:req.body.id,
+            device_type:req.body.type
         })
 
 

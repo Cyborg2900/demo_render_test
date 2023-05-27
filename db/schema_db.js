@@ -30,6 +30,17 @@ const device_schema= new mongoose.Schema({
     default: 24,
   },
 
+  status_hum: {
+    type: Number,
+    default: 24,
+  },
+
+  status_motion:{
+    type:Number,
+    default:0
+  },
+
+
   last_time:{
     type:Number,
     require:true,
@@ -39,6 +50,10 @@ const device_schema= new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  device_type:{
+    type:Number,
+    default:1
+  }
 });
 
 
@@ -78,5 +93,3 @@ const D_username=mongoose.model('D_username',device_username);
 
 
 module.exports = {User_model,D_model,D_username};
-
-

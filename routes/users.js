@@ -97,23 +97,45 @@ router.route('/device')
             if(data.email==req.body.email){  // to check if the request made  is by a genuine owner
                 D_model.findOne({uid:data.uid}).then((device)=>{
                     //console.log(device);///////////
-                    if(Date.now()-device.last_time>5000){ // to check weather device is ofline or not 
+                    if(Date.now()-device.last_time>5000 && device.device_type==1){ // to check weather device is ofline or not 
                         res.send({
                             'output':'device is ofline',
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
                             status_4:device.status_4,
-                            status_temp:device.status_temp
-                        })
-                    }else{
+                            status_temp:device.status_temp,
+                            status_hum:device.status_hum,
+                        });
+                    }else if(Date.now()-device.last_time>5000 && device.device_type==2){
                         res.send({
+                            'output':'device is ofline',
+                            status_1:device.status_1,
+                            status_2:device.status_2,
+                            status_3:device.status_3,
+                            status_4:device.status_4,
+                            status_motion:device.status_motion,
+                        });
+                    }else if(device.device_type==1){
+                        res.send({
+                            'output':'device is online',
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
                             status_4:device.status_4,
                             status_temp:device.status_temp,
+                            status_hum:device.status_hum,
                         })
+                    }else{
+                        res.send({
+                            'output':'device is online',
+                            status_1:device.status_1,
+                            status_2:device.status_2,
+                            status_3:device.status_3,
+                            status_4:device.status_4,
+                            status_motion:device.status_motion,
+                        });
+
                     }
                 })
             }else{
