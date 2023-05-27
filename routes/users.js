@@ -263,7 +263,7 @@ router.route('/device/add')
                     return ;
                 }
                 if(data.email==req.body.email){
-                    User_model.updateOne({email:email},{ $pull: { devices: req.body.username }}).then(()=>{
+                    User_model.updateOne({email:req.body.email},{ $pull: { devices: req.body.username }}).then(()=>{
                         data.email=null;
                         data.save().then(()=>{
                             res.send({
