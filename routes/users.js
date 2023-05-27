@@ -99,7 +99,8 @@ router.route('/device')
                     //console.log(device);///////////
                     if(Date.now()-device.last_time>5000 && device.device_type==1){ // to check weather device is ofline or not 
                         res.send({
-                            'output':'device is ofline',
+                            'output':'device is offline',
+                            type:1,
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
@@ -109,7 +110,8 @@ router.route('/device')
                         });
                     }else if(Date.now()-device.last_time>5000 && device.device_type==2){
                         res.send({
-                            'output':'device is ofline',
+                            'output':'device is offline',
+                            type:2,
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
@@ -119,6 +121,7 @@ router.route('/device')
                     }else if(device.device_type==1){
                         res.send({
                             'output':'device is online',
+                            type:1,
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
@@ -129,6 +132,7 @@ router.route('/device')
                     }else{
                         res.send({
                             'output':'device is online',
+                            type:2,
                             status_1:device.status_1,
                             status_2:device.status_2,
                             status_3:device.status_3,
