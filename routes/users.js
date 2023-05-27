@@ -91,7 +91,7 @@ router.use('/device', authenticateToken);
 
 router.route('/device')
     .post(async(req,res)=>{  // when user ask for the status of specific decive
-        console.log("\n\n\n",req.body.email);
+        console.log("\n\n",req.body.email);
 
         D_username.findOne({d_name:req.body.username}).then((data)=>{
             if(data.email==req.body.email){  // to check if the request made  is by a genuine owner
@@ -156,6 +156,7 @@ router.route('/device')
     })
     .put(async(req,res)=>{
         // changes made to any particular device 
+        console.log(req.body,'put');
         D_username.findOne(({d_name:req.body.username})).then((data)=>{
             if(data.email==req.body.email){
                 D_model.findOne({uid:data.uid}).then((device)=>{
@@ -208,7 +209,7 @@ router.route('/device')
 router.route('/device/add')
     .post(async(req,res)=>{
         const email=req.body.email;
-        console.log(req.body.username,email)
+        console.log(req.body.username,email,'device add');
         D_username.findOne({d_name:req.body.username}).then((data)=>{
             if(data==null){
                 res.send({

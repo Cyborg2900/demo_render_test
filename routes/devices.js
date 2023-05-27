@@ -9,7 +9,7 @@ router.route('/get')
 
       const id=req.body.id;
       const device=req.body;
-      console.log(device);
+      console.log(device, " post");
       D_model.findOne({uid:id}).then((data)=>{
         if(data.type==1){
             D_model.updateOne({uid:id},{$set: {last_time:Date.now() , status_temp:device.temp , status_hum:device.hum}}).then(()=>{
