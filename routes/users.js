@@ -209,7 +209,11 @@ router.route('/device/add')
                 res.send({
                     'output':'wrong otp'
                 });
-            }else{
+            }else if(data.email==req.body.email){
+                res.send({
+                    'output':'device already registered with this email'
+                })
+            }else {
                 res.send({
                     'output':'device already registered with another email'
                 })
