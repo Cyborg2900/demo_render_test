@@ -99,7 +99,7 @@ router.route('/device')
                     //console.log(device);///////////
                     if(Date.now()-device.last_time>5000 && device.device_type==1){ // to check weather device is ofline or not 
                         res.send({
-                            'output':'device is offline',
+                            'output':'esp is offline',
                             type:1,
                             status_1:device.status_1,
                             status_2:device.status_2,
@@ -110,7 +110,7 @@ router.route('/device')
                         });
                     }else if(Date.now()-device.last_time>5000 && device.device_type==2){
                         res.send({
-                            'output':'device is offline',
+                            'output':'esp is offline',
                             type:2,
                             status_1:device.status_1,
                             status_2:device.status_2,
@@ -120,7 +120,7 @@ router.route('/device')
                         });
                     }else if(device.device_type==1){
                         res.send({
-                            'output':'device is online',
+                            'output':'esp is online',
                             type:1,
                             status_1:device.status_1,
                             status_2:device.status_2,
@@ -131,7 +131,7 @@ router.route('/device')
                         })
                     }else{
                         res.send({
-                            'output':'device is online',
+                            'output':'esp is online',
                             type:2,
                             status_1:device.status_1,
                             status_2:device.status_2,
@@ -144,7 +144,7 @@ router.route('/device')
                 })
             }else{
                 res.send({
-                    'output':'device does not belong to you'
+                    'output':'esp does not belong to you'
                 })
                 return ;
             }
@@ -222,7 +222,7 @@ router.route('/device/add')
                     data.email=email;
                     data.save().then(()=>{
                         res.send({
-                            'output':'device added to db'
+                            'output':'esp added to db'
                         })
                     }).catch((err)=>{
                         console.log(err)
@@ -258,7 +258,7 @@ router.route('/device/add')
             D_username.findOne({d_name:req.body.username}).then((data)=>{
                 if(data==null){
                     res.send({
-                        'output':'no device with this username exits '
+                        'output':'no esp with this username exits '
                     })
                     return ;
                 }
@@ -267,7 +267,7 @@ router.route('/device/add')
                         data.email=null;
                         data.save().then(()=>{
                             res.send({
-                                'output':'device added to db'
+                                'output':'esp deleted to db'
                             })
                         }).catch((err)=>{
                             console.log(err)
