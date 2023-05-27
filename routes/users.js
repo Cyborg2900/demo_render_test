@@ -190,7 +190,7 @@ router.route('/device/add')
                 })
                 return ;
             }
-            if(data.otp==req.body.otp){
+            if(data.otp==req.body.otp && data.email==null){
                 User_model.updateOne({email:email},{ $push: { devices: req.body.username }}).then(()=>{
                     data.email=email;
                     data.save().then(()=>{
@@ -205,10 +205,14 @@ router.route('/device/add')
                     console.log(err)
                     res.json({'output':"error occured"});
                 })
-            }else{
+            }else if(data.otp!=req.body.otp){
                 res.send({
                     'output':'wrong otp'
                 });
+            }else{
+                res.send({
+                    'output':'device already registered with another email'
+                })
             }
 
         }).catch((err)=>{
