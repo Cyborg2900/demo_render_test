@@ -174,7 +174,7 @@ router.route('/device')
                     }else{
                         D_model.updateOne({uid:data.uid} ,{ $set: {status_1:user_device.status_1,status_2:user_device.status_2,status_3:user_device.status_3,status_4:user_device.status_4 , sync:false }}).then(()=>{
                             setTimeout(()=>{
-                                D_model.findOne({uid:id}).then((data1)=>{
+                                D_model.findOne({uid:data.uid}).then((data1)=>{
                                     if(data1.sync){
                                         res.send({
                                             'output':'device is in sync'
