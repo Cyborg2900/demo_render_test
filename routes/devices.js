@@ -16,6 +16,7 @@ router.route('/get')
             D_model.updateOne({uid:id},{$set: {last_time:Date.now() , status_temp:device.temp , status_hum:device.hum}}).then(()=>{
               if(data.status_1==device.status_1 && data.status_2==device.status_2 && data.status_3==device.status_3 && data.status_4==device.status_4){
                 D_model.updateOne({uid:id},{$set:{sync:true}}).then(()=>{
+                  console.log(data,device);
                     res.status(200).send({
                       status_1:data.status_1,
                       status_2:data.status_2,
@@ -28,6 +29,7 @@ router.route('/get')
                 })
               }else{
                 D_model.updateOne({uid:id},{$set:{sync:false}}).then(()=>{
+                  console.log(data,device);
                   res.status(200).send({
                     status_1:data.status_1,
                     status_2:data.status_2,
