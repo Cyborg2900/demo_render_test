@@ -16,7 +16,12 @@ router.route('/get')
             D_model.updateOne({uid:id},{$set: {last_time:Date.now() , status_temp:device.temp , status_hum:device.hum}}).then(()=>{
               if(data.status_1==device.status_1 && data.status_2==device.status_2 && data.status_3==device.status_3 && data.status_4==device.status_4){
                 D_model.updateOne({uid:id},{$set:{sync:true}}).then(()=>{
-                    res.status(200).send('device are in sync');
+                    res.status(200).send({
+                      status_1:data.status_1,
+                      status_2:data.status_2,
+                      status_3:data.status_3,
+                      status_4:data.status_4,
+                    });
                 }).catch((err)=>{    
                   console.log(err); 
                   res.status(200).send("error occured");
@@ -42,7 +47,12 @@ router.route('/get')
           D_model.updateOne({uid:id},{$set: {last_time:Date.now(), status_motion:device.motion}}).then(()=>{
             if(data.status_1==device.status_1 && data.status_2==device.status_2 && data.status_3==device.status_3 && data.status_4==device.status_4){
               D_model.updateOne({uid:id},{$set:{sync:true}}).then(()=>{
-                  res.status(200).send('device are in sync');
+                  res.status(200).send({
+                    status_1:data.status_1,
+                    status_2:data.status_2,
+                    status_3:data.status_3,
+                    status_4:data.status_4,
+                  });
               }).catch((err)=>{
                 console.log(err); 
                 res.send("error occured");
