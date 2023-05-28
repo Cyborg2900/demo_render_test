@@ -184,7 +184,7 @@ router.route('/device')
                                         res.json({'output':"error occured check after sometime"});
                                     }
                                 })
-                            },8000);
+                            },4000);
                         }).catch((err)=>{
                             console.log(err)
                             res.json({'output':"error occured"});
