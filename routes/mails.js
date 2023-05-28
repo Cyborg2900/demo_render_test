@@ -76,34 +76,35 @@ router.route('/reset')
                 res.send({
                     'output':'no such email exits'
                 })
-                retrun ;
-            }
-
-            if(data.otp==req.body.otp){
-                bcrypt.hash(req.body.password,10).then((hash)=>{
-                    User_model.updateOne({email:req.body.email},{$set:{password:hash ,otp:null}}).then(()=>{
-                        res.send({
-                            'output':'password reset please login again with new password'
+            }else {
+                if(data.otp==req.body.otp){
+                    bcrypt.hash(req.body.password,10).then((hash)=>{
+                        User_model.updateOne({email:req.body.email},{$set:{password:hash ,otp:null}}).then(()=>{
+                            res.send({
+                                'output':'password reset please login again with new password'
+                            })
+                        }).catch((error)=>{
+                            console.log(error);
+                            res.send({
+                                'output':'error occured '
+                            })
                         })
                     }).catch((error)=>{
                         console.log(error);
                         res.send({
-                            'output':'error occured '
+                            'output':'error occured while hashing  '
                         })
                     })
-                }).catch((error)=>{
-                    console.log(error);
+                }else {
+                    console.log('wrong otp ');
                     res.send({
-                        'output':'error occured while hashing  '
-                    })
-                })
-            }else {
-                console.log('wrong otp ');
-                res.send({
-                    'output':"wrong otp ",
-                });
-
+                        'output':"wrong otp ",
+                    });
+    
+                }
             }
+
+            
         }).catch((error)=>{
             console.log(error);
             res.send({
