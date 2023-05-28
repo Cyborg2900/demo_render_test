@@ -6,6 +6,8 @@ const router=express.Router();
 
 const nodemailer = require('nodemailer');
 
+const bcrypt=require('bcrypt');
+
 const {User_model,D_model,D_username}=require('../db/schema_db');
 
 const transporter = nodemailer.createTransport({
