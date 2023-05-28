@@ -9,10 +9,12 @@ const nodemailer = require('nodemailer');
 const {User_model,D_model,D_username}=require('../db/schema_db');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, //ssl
     auth: {
-      user: 'sarthakdevlopment@gmail.com',
-      pass: process.env.Gmail_Password,
+        user:process.env.EMAIL,
+        pass:process.env.EMAIL_PASSWORD
     }
   });
 
@@ -31,7 +33,7 @@ router.route('/reset')
             const otp=Math.floor(100000 + Math.random() * 900000) // saving otp 
             User_model.updateOne({email:req.body.email},{$set : {otp:otp}}).then(()=>{
                 const mailOptions = {
-                    from: 'sarthakdevlopment@gmail.com',
+                    from: process.env.EMAIL,
                     to: req.body.email,
                     subject: 'Reset Password',
                     text: `The otp for this request is 
