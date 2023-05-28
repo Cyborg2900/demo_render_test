@@ -8,8 +8,6 @@ const jwt= require('jsonwebtoken');
 
 const bcrypt=require('bcrypt');
 
-const bcrypt=require('bcrypt');
-
 const jwt_auth=require('../authentication/token_auth');
 
 const {User_model,D_model,D_username}=require('../db/schema_db');
