@@ -1,8 +1,12 @@
+require('dotenv').config();
+
 const express=require('express');
 
 const router=express.Router();
 
 const jwt= require('jsonwebtoken');
+
+const bcrypt=require('bcrypt');
 
 const bcrypt=require('bcrypt');
 
@@ -258,17 +262,48 @@ router.route('/device/add')
             D_username.findOne({d_name:req.body.username}).then((data)=>{
                 if(data==null){
                     res.send({
-                        'output':'no esp with this username exits '
+                        'output':'no esp with this username exits'
                     })
                     return ;
                 }
                 if(data.email==req.body.email){
                     User_model.updateOne({email:req.body.email},{ $pull: { devices: req.body.username }}).then(()=>{
                         data.email=null;
+                        const otp=Math.floor(100000 + Math.random() * 900000)
+                        data.otp=otp;
                         data.save().then(()=>{
-                            res.send({
-                                'output':'esp deleted to db'
-                            })
+                            // mails    
+                            const transporter = nodemailer.createTransport({
+                                host: 'smtp.gmail.com',
+                                port: 465,
+                                secure: true, //ssl
+                                auth: {
+                                    user:process.env.EMAIL,
+                                    pass:process.env.EMAIL_PASSWORD
+                                }
+                              });
+
+                              const mailOptions = {
+                                from: process.env.EMAIL,
+                                to: req.body.email,
+                                subject: 'Reset Password',
+                                text: `The otp for esp is  
+                                     ${otp}`
+                              };
+
+                              transporter.sendMail(mailOptions,(error,info)=>{
+                                if(error){
+                                    console.log(error);
+                                    res.send({
+                                        'output':"error occured during reset password"
+                                    });
+                                }else{
+                                    console.log('email send');
+                                    res.send({
+                                        'output':'esp deleted succesfully '
+                                    });
+                                }
+                              })
                         }).catch((err)=>{
                             console.log(err)
                             res.json({'output':"error occured"});
@@ -293,7 +328,6 @@ router.route('/device/add')
             })
 
         })
-
 
 
 

@@ -86,6 +86,10 @@ const user_schema=new mongoose.Schema({
   otp:{
     type:Number,
     default:null
+  },
+  name:{
+    type:String,
+    default:null
   }
 });
 
