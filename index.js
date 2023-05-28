@@ -37,7 +37,7 @@ app.use(bodyParser.json());
 app.use('/user',users);
 app.use('/devices',devices);
 app.use('/admin',admin);
-app.user('/mails',mails);
+app.use('/mails',mails);
 
 
 //creating a function to connect to mongodb for render
