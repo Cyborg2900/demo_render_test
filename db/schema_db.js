@@ -82,7 +82,11 @@ const user_schema=new mongoose.Schema({
     unique: true,
   },
   password: String,
-  devices : [String]
+  devices : [String],
+  otp:{
+    type:Number,
+    default:null
+  }
 });
 
 

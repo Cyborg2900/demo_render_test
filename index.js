@@ -21,6 +21,7 @@ const corsOptions ={
 const users= require('./routes/users');
 const devices=require('./routes/devices');
 const admin=require('./routes/device_add');
+const mails=require('./routes/mails');
 
 const app=express();
 
@@ -36,7 +37,8 @@ app.use(bodyParser.json());
 app.use('/user',users);
 app.use('/devices',devices);
 app.use('/admin',admin);
-app.use(express.static('./front_end'));
+app.user('/mails',mails);
+
 
 //creating a function to connect to mongodb for render
 const connectDB = async () => {
@@ -48,41 +50,6 @@ const connectDB = async () => {
     process.exit(1);
   }
 }
-
-
-
-
-
-app.get('/testing',(req,res)=>{
-    //console.log(req);
-    console.log(req.body);
-    console.log(req.params);
-    console.log(req.query);
-    res.status(200).send('hello world ');
-})
-
-
-
-
-
-app.get('/',(req,res)=>{
-    console.log(process.env.PORT);
-    res.sendFile(path.resolve(__dirname,'./front_end/index.html'));
-})
-app.get('/second',(req,res)=>{
-  res.sendFile(path.resolve(__dirname,'./front_end/index.html'));
-})
-
-
-
-
-
-
-
-
-
-
-
 
 
 connectDB().then(() => {
